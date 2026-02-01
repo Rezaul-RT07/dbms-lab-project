@@ -1,0 +1,148 @@
+-- MODULE: ADMIN DASHBOARD (dashboard.php)
+
+
+-- 1. Get Total Farmers Count
+SELECT COUNT(*) as count FROM Farmer;
+
+-- 2. Get Total Active Crops Count
+SELECT COUNT(*) as count FROM Crop;
+
+-- 3. Get Total Orders Count
+SELECT COUNT(*) as count FROM Orders;
+
+-- 4. Calculate Total Revenue (Sum of all orders)
+SELECT SUM(total_price) as total FROM Orders;
+
+-- 5. Fetch Recent 5 Orders for Activity Feed
+SELECT order_id, order_date, order_status, total_price 
+FROM Orders 
+ORDER BY order_date DESC 
+LIMIT 5;
+
+
+
+-- MODULE: FARMER MANAGEMENT (farmers.php)
+
+-- 6. Register New Farmer
+INSERT INTO Farmer (name, nid, phone, district, upazila) 
+VALUES ('$name', '$nid', '$phone', '$district', '$upazila');
+
+-- 7. View All Registered Farmers
+SELECT * FROM Farmer;
+
+
+-- MODULE: CROP MANAGEMENT (crops.php)
+
+-- 8. Add New Crop Production Record (Admin)
+INSERT INTO Crop (crop_name, quantity, expected_price, harvest_date, farmer_id) 
+VALUES ('$crop_name', '$quantity', '$expected_price', '$harvest_date', '$farmer_id');
+
+-- 9. Fetch Farmers for Dropdown Selection
+SELECT farmer_id, name FROM Farmer;
+
+-- 10. View All Crops with Farmer Details
+SELECT Crop.*, Farmer.name as farmer_name 
+FROM Crop 
+LEFT JOIN Farmer ON Crop.farmer_id = Farmer.farmer_id;
+
+
+-- MODULE: BUYER MANAGEMENT (buyers.php)
+
+-- 11. Register New Buyer
+INSERT INTO Buyer (buyer_name, buyer_type, location, phone) 
+VALUES ('$buyer_name', '$buyer_type', '$location', '$phone');
+
+-- 12. View All Buyers
+SELECT * FROM Buyer;
+
+
+
+-- MODULE: ORDER MANAGEMENT (orders.php)
+
+-- 13. Fetch Crop Price for Order Calculation
+SELECT expected_price FROM Crop WHERE crop_id = $crop_id;
+
+-- 14. Place New Order (Admin)
+INSERT INTO Orders (order_date, order_status, total_price, crop_id, buyer_id) 
+VALUES ('$order_date', '$order_status', '$total_price', '$crop_id', '$buyer_id');
+
+-- 15. Count Pending Orders
+SELECT COUNT(*) as count FROM Orders WHERE order_status = 'Pending';
+
+-- 16. Count Completed Orders
+SELECT COUNT(*) as count FROM Orders WHERE order_status = 'Completed';
+
+-- 17. View All Orders with Buyer and Crop Details
+SELECT Orders.*, Buyer.buyer_name, Crop.crop_name 
+FROM Orders 
+LEFT JOIN Buyer ON Orders.buyer_id = Buyer.buyer_id
+LEFT JOIN Crop ON Orders.crop_id = Crop.crop_id
+ORDER BY order_date DESC;
+
+
+-- MODULE: FARMER PORTAL (farmer_dashboard.php)
+
+-- 18. Farmer: Add New Listing
+INSERT INTO Crop (crop_name, quantity, expected_price, harvest_date, farmer_id) 
+VALUES ('$crop_name', '$quantity', '$expected_price', '$harvest_date', '$farmer_id');
+
+-- 19. Farmer: Delete Own Listing
+DELETE FROM Crop WHERE crop_id=$id AND farmer_id=$farmer_id;
+
+-- 20. Farmer: View Own Listings
+SELECT * FROM Crop WHERE farmer_id = $farmer_id ORDER BY crop_id DESC;
+
+-- 21. Farmer: View Incoming Orders for Their Crops
+SELECT o.*, c.crop_name, b.buyer_name 
+FROM Orders o 
+JOIN Crop c ON o.crop_id = c.crop_id 
+JOIN Buyer b ON o.buyer_id = b.buyer_id 
+WHERE c.farmer_id = $farmer_id 
+ORDER BY o.order_date DESC;
+
+-- 22. Farmer: Validate Order Ownership before Update
+SELECT o.order_id 
+FROM Orders o 
+JOIN Crop c ON o.crop_id = c.crop_id 
+WHERE o.order_id=$oid AND c.farmer_id=$farmer_id;
+
+-- 23. Farmer: Update Order Status (Accept/Reject/Deliver)
+UPDATE Orders SET order_status='$status' WHERE order_id=$oid;
+
+-- 24. Farmer: Calculate Total Earnings (Completed Orders Only)
+SELECT SUM(o.total_price) as s 
+FROM Orders o 
+JOIN Crop c ON o.crop_id = c.crop_id 
+WHERE c.farmer_id = $farmer_id AND o.order_status = 'Completed';
+
+
+
+-- MODULE: BUYER MARKETPLACE (marketplace.php)
+
+-- 25. Buyer: Browse Marketplace (with Search)
+SELECT Crop.*, Farmer.name as farmer_name, Farmer.district 
+FROM Crop 
+JOIN Farmer ON Crop.farmer_id = Farmer.farmer_id 
+WHERE Crop.crop_name LIKE '%$search%' OR Farmer.district LIKE '%$search%' 
+ORDER BY Crop.crop_id DESC;
+
+-- 26. Buyer: Purchase Item
+INSERT INTO Orders (order_date, order_status, total_price, crop_id, buyer_id) 
+VALUES ('$order_date', 'Pending', '$price', '$crop_id', '$buyer_id');
+
+-- 27. Buyer: View My Order History
+SELECT o.*, c.crop_name, f.name as farmer_name 
+FROM Orders o
+JOIN Crop c ON o.crop_id = c.crop_id
+JOIN Farmer f ON c.farmer_id = f.farmer_id
+WHERE o.buyer_id = $buyer_id
+ORDER BY o.order_id DESC;
+
+-- 28. Buyer: Cancel Pending Order
+DELETE FROM Orders 
+WHERE order_id=$oid AND buyer_id=$buyer_id AND order_status='Pending';
+
+-- 29. Buyer: Calculate Total Spent
+SELECT SUM(total_price) as s 
+FROM Orders 
+WHERE buyer_id = $buyer_id AND order_status IN ('Confirmed', 'Completed');

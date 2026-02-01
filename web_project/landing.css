@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap');
+
+:root {
+    --primary: #689F38;
+    /* Fresh Green */
+    --primary-dark: #33691E;
+    --bg-color: #E0E0E0;
+    --card-bg: #FFFFFF;
+    --curve-color: #689F38;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image: radial-gradient(#F5F5F5 1px, transparent 1px);
+    background-size: 20px 20px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.landing-card {
+    background: var(--card-bg);
+    width: 600px;
+    /* Slightly wider to fit illustration */
+    max-width: 90%;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    background: white;
+    padding: 2rem 2rem 0 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.logo {
+    color: #558B2F;
+    font-size: 2.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.illustration-container {
+    margin-bottom: -40px;
+    /* Overlap with footer */
+    position: relative;
+    z-index: 10;
+}
+
+.illustration-container img {
+    width: 80%;
+    /* Adjust based on image */
+    height: auto;
+    max-width: 400px;
+    filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.1));
+}
+
+.card-footer {
+    background: var(--curve-color);
+    padding: 5rem 2rem 2rem 2rem;
+    /* Top padding to accommodate curve/overlap */
+    position: relative;
+    color: white;
+    /* Create a curved top edge */
+    clip-path: ellipse(150% 100% at 50% 100%);
+    /* Since clip-path cuts off shadow, we just use a curved pseudo element or simpler approach */
+    /* Let's try a simpler border radius trick for the "hill" look */
+}
+
+/* Alternative to clip-path for browser compatibility and shadow */
+.card-footer-bg {
+    background: var(--curve-color);
+    padding: 60px 2rem 2rem;
+    border-top-left-radius: 50% 60px;
+    border-top-right-radius: 50% 60px;
+    margin-top: -30px;
+    /* Pull up */
+    position: relative;
+    z-index: 5;
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    text-decoration: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-light {
+    background: rgba(255, 255, 255, 0.9);
+    color: #33691E;
+}
+
+.btn-dark {
+    background: #33691E;
+    color: white;
+}
+
+.tagline {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
